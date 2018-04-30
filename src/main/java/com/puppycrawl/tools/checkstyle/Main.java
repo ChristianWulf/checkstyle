@@ -537,7 +537,7 @@ public final class Main {
                 ignoredModulesOptions, multiThreadModeSettings);
 
         // create a listener for output
-        final AuditListener listener = createListener(cliOptions.format, cliOptions.outputLocation);
+        final AuditListener listener = createAuditListener(cliOptions.format, cliOptions.outputLocation);
 
         // create RootModule object and run it
         final int errorCounter;
@@ -609,34 +609,24 @@ public final class Main {
      * @return a fresh new {@code AuditListener}
      * @exception IOException when provided output location is not found
      */
-    private static AuditListener createListener(String format,
-                                                String outputLocation)
+    private static AuditListener createAuditListener(String format,
+                                                     String outputLocation)
             throws IOException {
-        // setup the output stream
-        final OutputStream out;
-        final AutomaticBean.OutputStreamOptions closeOutputStream;
-        if (outputLocation == null) {
-            out = System.out;
-            closeOutputStream = AutomaticBean.OutputStreamOptions.NONE;
-        }
-        else {
-            out = Files.newOutputStream(Paths.get(outputLocation));
-            closeOutputStream = AutomaticBean.OutputStreamOptions.CLOSE;
-        }
 
-        // setup a listener
         final AuditListener listener;
         if (XML_FORMAT_NAME.equals(format)) {
-            listener = new XMLLogger(out, closeOutputStream);
+            final OutputStream out = getOutputStream(format);
+            final AutomaticBean.OutputStreamOptions closeOutputStreamOption =
+                    getOutputStreamOptions(outputLocation);
+            listener = new XMLLogger(out, closeOutputStreamOption);
         }
         else if (PLAIN_FORMAT_NAME.equals(format)) {
-            listener = new DefaultLogger(out, closeOutputStream, out,
-                    AutomaticBean.OutputStreamOptions.NONE);
+            final OutputStream out = getOutputStream(format);
+            final AutomaticBean.OutputStreamOptions closeOutputStreamOption =
+                    getOutputStreamOptions(outputLocation);
+            listener = new DefaultLogger(out, closeOutputStreamOption);
         }
         else {
-            if (closeOutputStream == AutomaticBean.OutputStreamOptions.CLOSE) {
-                CommonUtils.close(out);
-            }
             final LocalizedMessage outputFormatExceptionMessage = new LocalizedMessage(0,
                     Definitions.CHECKSTYLE_BUNDLE, CREATE_LISTENER_EXCEPTION,
                     new String[] {format, PLAIN_FORMAT_NAME, XML_FORMAT_NAME}, null,
@@ -645,6 +635,28 @@ public final class Main {
         }
 
         return listener;
+    }
+
+    private static OutputStream getOutputStream(String outputLocation) throws IOException {
+        final OutputStream result;
+        if (outputLocation == null) {
+            result = System.out;
+        }
+        else {
+            result = Files.newOutputStream(Paths.get(outputLocation));
+        }
+        return result;
+    }
+
+    private static AutomaticBean.OutputStreamOptions getOutputStreamOptions(String outputLocation) throws IOException {
+        final AutomaticBean.OutputStreamOptions result;
+        if (outputLocation == null) {
+            result = AutomaticBean.OutputStreamOptions.NONE;
+        }
+        else {
+            result = AutomaticBean.OutputStreamOptions.CLOSE;
+        }
+        return result;
     }
 
     /**

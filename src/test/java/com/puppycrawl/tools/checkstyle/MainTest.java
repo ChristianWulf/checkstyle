@@ -52,6 +52,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.ExpectedSystemExit;
@@ -536,6 +537,10 @@ public class MainTest {
         }
     }
 
+    /**
+     * We use access to private method here to test stream closure
+     * @throws Exception
+     */
     @Test
     public void testCreateListenerWithLocationIllegalStateException() throws Exception {
         mockStatic(CommonUtils.class);
