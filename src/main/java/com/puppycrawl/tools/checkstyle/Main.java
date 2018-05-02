@@ -537,7 +537,7 @@ public final class Main {
                 ignoredModulesOptions, multiThreadModeSettings);
 
         // create a listener for output
-        final AuditListener listener = createAuditListener(cliOptions.format, cliOptions.outputLocation);
+        final AuditListener listener = createListener(cliOptions.format, cliOptions.outputLocation);
 
         // create RootModule object and run it
         final int errorCounter;
@@ -609,19 +609,19 @@ public final class Main {
      * @return a fresh new {@code AuditListener}
      * @exception IOException when provided output location is not found
      */
-    private static AuditListener createAuditListener(String format,
+    private static AuditListener createListener(String format,
                                                      String outputLocation)
             throws IOException {
 
         final AuditListener listener;
         if (XML_FORMAT_NAME.equals(format)) {
-            final OutputStream out = getOutputStream(format);
+            final OutputStream out = getOutputStream(outputLocation);
             final AutomaticBean.OutputStreamOptions closeOutputStreamOption =
                     getOutputStreamOptions(outputLocation);
             listener = new XMLLogger(out, closeOutputStreamOption);
         }
         else if (PLAIN_FORMAT_NAME.equals(format)) {
-            final OutputStream out = getOutputStream(format);
+            final OutputStream out = getOutputStream(outputLocation);
             final AutomaticBean.OutputStreamOptions closeOutputStreamOption =
                     getOutputStreamOptions(outputLocation);
             listener = new DefaultLogger(out, closeOutputStreamOption);
@@ -637,6 +637,13 @@ public final class Main {
         return listener;
     }
 
+    /**
+     * Create output stream or return System.out
+     * @param outputLocation output location
+     * @return output stream
+     * @throws IOException might happen
+     */
+    @SuppressWarnings("resource")
     private static OutputStream getOutputStream(String outputLocation) throws IOException {
         final OutputStream result;
         if (outputLocation == null) {
@@ -648,7 +655,7 @@ public final class Main {
         return result;
     }
 
-    private static AutomaticBean.OutputStreamOptions getOutputStreamOptions(String outputLocation) throws IOException {
+    private static AutomaticBean.OutputStreamOptions getOutputStreamOptions(String outputLocation) {
         final AutomaticBean.OutputStreamOptions result;
         if (outputLocation == null) {
             result = AutomaticBean.OutputStreamOptions.NONE;

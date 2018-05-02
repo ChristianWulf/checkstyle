@@ -204,6 +204,16 @@ public class WriteTagCheckTest extends AbstractModuleTestSupport {
         verify(checkConfig, getPath("InputWriteTag2.java"), expected);
     }
 
+    /**
+     * custom verify.
+     * We suppress Resource close as This Check is deprecated
+     * @param checker {@link Checker} instance.
+     * @param processedFiles list of files to verify.
+     * @param messageFileName message file name.
+     * @param expected an array of expected messages.
+     * @throws Exception might happpen
+     */
+    @SuppressWarnings("resource")
     @Override
     protected void verify(Checker checker,
                           File[] processedFiles,

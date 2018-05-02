@@ -69,6 +69,7 @@ public abstract class AbstractModuleTestSupport extends AbstractPathTestSupport 
 
     private static final String ROOT_MODULE_NAME = "root";
 
+    @SuppressWarnings("resource")
     private final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
     /**
